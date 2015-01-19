@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+
+import org.usfirst.frc.team4550.chassis.Chassis;
 import org.usfirst.frc.team4550.robot.commands.ExampleCommand;
 import org.usfirst.frc.team4550.robot.subsystems.ExampleSubsystem;
 
@@ -18,7 +20,9 @@ public class Robot extends IterativeRobot
 {
 
 	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
-	public static OI oi;
+
+	public static OI _oi;
+	public Chassis _chassis;
 
 	Command autonomousCommand;
 
@@ -28,11 +32,12 @@ public class Robot extends IterativeRobot
 	 */
 	public void robotInit()
 	{
+		// Creates the OI and the Chassis of the robot
+		_oi = new OI();
+		_chassis = Chassis.getInstance();
 
-		oi = new OI();
 		// instantiate the command used for the autonomous period
 		autonomousCommand = new ExampleCommand();
-
 	}
 
 	public void disabledPeriodic()
@@ -44,7 +49,9 @@ public class Robot extends IterativeRobot
 	{
 		// schedule the autonomous command (example)
 		if( autonomousCommand != null )
+		{
 			autonomousCommand.start();
+		}
 	}
 
 	/**
@@ -62,7 +69,9 @@ public class Robot extends IterativeRobot
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
 		if( autonomousCommand != null )
+		{
 			autonomousCommand.cancel();
+		}
 	}
 
 	/**
@@ -71,7 +80,7 @@ public class Robot extends IterativeRobot
 	 */
 	public void disabledInit()
 	{
-
+		_chassis.reset();
 	}
 
 	/**
@@ -80,6 +89,9 @@ public class Robot extends IterativeRobot
 	public void teleopPeriodic()
 	{
 		Scheduler.getInstance().run();
+
+		// Drives the chassis by getting the position of the axis of the joystick
+		_chassis.drive( _oi.getLJoystickXAxis(), _oi.getLJoystickYAxis() );
 	}
 
 	/**
@@ -87,11 +99,7 @@ public class Robot extends IterativeRobot
 	 */
 	public void testPeriodic()
 	{
-
 		LiveWindow.run();
-//		oi.printAxis();
-		oi.printButtons();
-
 	}
 
 }

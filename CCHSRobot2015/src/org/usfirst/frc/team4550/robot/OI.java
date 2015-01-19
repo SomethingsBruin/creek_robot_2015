@@ -1,10 +1,7 @@
 package org.usfirst.frc.team4550.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.buttons.Button;
 import static org.usfirst.frc.team4550.robot.RobotMap.*;
-
-import org.usfirst.frc.team4550.robot.commands.ExampleCommand;
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -14,8 +11,8 @@ public class OI
 {
 
 	// // CREATING BUTTONS
-	// One type of button is a joystick button which is any button on a joystick.
-	// You create one by telling it which joystick it's on and which button
+	// One type of button is a _joystick button which is any button on a _joystick.
+	// You create one by telling it which _joystick it's on and which button
 	// number it is.
 	// Joystick stick = new Joystick(port);
 	// Button button = new JoystickButton(stick, buttonNumber);
@@ -40,28 +37,31 @@ public class OI
 	// until it is finished as determined by it's isFinished method.
 	// button.whenReleased(new ExampleCommand());
 
-	Joystick joystick;
+	// The Joystick that the driver is using
+	private Joystick _joystick;
 
 	public OI()
 	{
-		// Sets the joystick to get input from port 0.
-		joystick = new Joystick( 0 );
+		// Sets the _joystick to get input from port 0.
+		_joystick = new Joystick( 0 );
 	}
 
 	public void printAxis()
 	{
-		for( int i = 0; i < joystick.getAxisCount(); i++ )
+		// Prints all of the axises on the controller
+		for( int i = 0; i < _joystick.getAxisCount(); i++ )
 		{
-			System.out.printf( "%10s", i + "   " + joystick.getRawAxis( i ) + "\t" );
+			System.out.printf( "%10s", i + "   " + _joystick.getRawAxis( i ) + "\t" );
 		}
 		System.out.println();
 	}
 
 	public void printButtons()
 	{
-		for( int i = 0; i < joystick.getButtonCount(); i++ )
+		// Prints all of the buttons on the controller
+		for( int i = 0; i < _joystick.getButtonCount(); i++ )
 		{
-			System.out.printf( "%10s", i + "   " + joystick.getRawButton( i ) + "\t" );
+			System.out.printf( "%10s", i + "   " + _joystick.getRawButton( i ) + "\t" );
 		}
 		System.out.println();
 	}
@@ -69,42 +69,43 @@ public class OI
 	public double getAxis( int axis )
 	{
 		// Returns the value of the specified axis.
-		return joystick.getRawAxis( axis );
+		return _joystick.getRawAxis( axis );
 	}
 
 	public double getLJoystickXAxis()
 	{
-		// Returns the left joystick's horizontal value.
-		return joystick.getRawAxis( L_JOYSTICK_HORIZONTAL );
+		// Returns the left _joystick's horizontal value.
+		return _joystick.getRawAxis( L_JOYSTICK_HORIZONTAL );
 	}
 
 	public double getLJoystickYAxis()
 	{
-		// Returns the left joystick's vertical value, which is inverted.
-		return joystick.getRawAxis( L_JOYSTICK_VERTICAL ) * -1;
+		// Returns the left _joystick's vertical value, which is inverted.
+		return _joystick.getRawAxis( L_JOYSTICK_VERTICAL ) * -1;
 	}
 
 	public double getRJoystickXAxis()
 	{
-		// Returns the right joystick's horizontal value.
-		return joystick.getRawAxis( R_JOYSTICK_HORIZONTAL );
+		// Returns the right _joystick's horizontal value.
+		return _joystick.getRawAxis( R_JOYSTICK_HORIZONTAL );
 	}
 
 	public double getRJoystickYAxis()
 	{
-		// Returns the right joystick's vertical value, which is inverted.
-		return joystick.getRawAxis( R_JOYSTICK_VERTICAL ) * -1;
+		// Returns the right _joystick's vertical value, which is inverted.
+		return _joystick.getRawAxis( R_JOYSTICK_VERTICAL ) * -1;
 	}
 
 	public double getL2R2()
 	{
 		// Returns the left / right bumpers.
-		return joystick.getRawAxis( L2_R2 );
+		return _joystick.getRawAxis( L2_R2 );
 	}
 
 	public static double normalize( double value )
 	{
-		//Nomalizes the
+		Math.pow( value, 5 );
+		// Normalizes the value.
 		if( value > 1 )
 		{
 			return 1;
@@ -113,7 +114,8 @@ public class OI
 		{
 			return -1;
 		}
-		
+
 		return value;
 	}
+
 }

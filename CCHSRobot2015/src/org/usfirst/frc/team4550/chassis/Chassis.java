@@ -4,25 +4,39 @@ import org.usfirst.frc.team4550.controls.CCTalon;
 import org.usfirst.frc.team4550.robot.OI;
 import org.usfirst.frc.team4550.robot.RobotMap;
 
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Gyro;
+
 public class Chassis
 {
 
-	private CCTalon _leftTop;
-	private CCTalon _leftBottom;
-	private CCTalon _rightTop;
-	private CCTalon _rightBottom;
-	private Chassis _instance;
+	private CCTalon _left;
+	// private CCTalon _leftBottom;
+	private CCTalon _right;
+	// private CCTalon _rightBottom;
+	private static Chassis _instance;
+
+	private Encoder _encoder;// The encoder for the chassis
+
+	private Gyro _gyro;// The gyro for the chassis
+
+	private double _kP = 0.0;// The kP value for correcting drift in the auto drive
 
 	private Chassis()
 	{
-		_leftTop = new CCTalon( RobotMap.LEFT_TOP_TALON_PORT, RobotMap.LEFT_TOP_TALON_REVERSE );
-		_leftBottom = new CCTalon( RobotMap.LEFT_BOTTOM_TALON_PORT, RobotMap.LEFT_BOTTOM_TALON_REVERSE );
-		_rightTop = new CCTalon( RobotMap.RIGHT_TOP_TALON_PORT, RobotMap.RIGHT_TOP_TALON_REVERSE );
-		_rightBottom = new CCTalon( RobotMap.RIGHT_BOTTOM_TALON_PORT, RobotMap.RIGHT_BOTTOM_TALON_REVERSE );
+		_left = new CCTalon( RobotMap.LEFT_TALON_PORT, RobotMap.LEFT_TALON_REVERSE );
+		_right = new CCTalon( RobotMap.RIGHT_TALON_PORT, RobotMap.RIGHT_TALON_REVERSE );
+
+		_encoder = new Encoder( RobotMap.ENCODER_PORT_A, RobotMap.ENCODER_PORT_B );
+		// The distance per tick of the encoder
+		_encoder.setDistancePerPulse( RobotMap.ENCODER_DISTANCE_PER_PULSE );
+
+		_gyro = new Gyro( RobotMap.GYRO_PORT );
 	}
 
-	public Chassis getInstance()
+	public static Chassis getInstance()
 	{
+		// Makes sure we only have one chassis and returns this chassis when asked
 		if( _instance == null )
 		{
 			_instance = new Chassis();
@@ -30,49 +44,49 @@ public class Chassis
 		return _instance;
 	}
 
-	public void drive( double rightHorizontal, double rightVertical, double leftHorizontal )
+	public void drive( double xVal, double yVal )
 	{
-		double leftTopSpeed = rightVertical;
-		double leftBottomSpeed = rightVertical;
-		double rightBottomSpeed = rightVertical;
-		double rightTopSpeed = rightVertical;
+		double tmpLeft = yVal; // For left motors
 
-		if( leftHorizontal < 0 )
-		{
-			leftTopSpeed *= -1 * leftHorizontal;
-			leftBottomSpeed *= -1 * leftHorizontal;
-			rightTopSpeed *= leftHorizontal;
-			rightBottomSpeed *= leftHorizontal;
-		}
-		else if( leftHorizontal > 0 )
-		{
-			leftTopSpeed *= leftHorizontal;
-			leftBottomSpeed *= leftHorizontal;
-			rightTopSpeed *= -1 * leftHorizontal;
-			rightBottomSpeed *= -1 * leftHorizontal;
-		}
-		else if( rightHorizontal < 0 )
-		{
-			leftTopSpeed *= rightHorizontal * -0.2;
-			leftBottomSpeed *= rightHorizontal * -0.2;
-			rightTopSpeed *= rightHorizontal;
-			rightBottomSpeed *= rightHorizontal;
-		}
-		else if( rightHorizontal > 0 )
-		{
-			leftTopSpeed *= rightHorizontal;
-			leftBottomSpeed *= rightHorizontal;
-			rightTopSpeed *= rightHorizontal * -0.20;
-			rightBottomSpeed *= rightHorizontal * -0.20;
-		}
-		leftTopSpeed = OI.normalize( leftTopSpeed );
-		leftBottomSpeed = OI.normalize( leftBottomSpeed );
-		rightTopSpeed = OI.normalize( rightTopSpeed );
-		rightBottomSpeed = OI.normalize( rightBottomSpeed );
+		tmpLeft += xVal;
+		tmpLeft = OI.normalize( tmpLeft );
 
-		_leftTop.set( leftTopSpeed );
-		_leftBottom.set( leftBottomSpeed );
-		_rightTop.set( rightTopSpeed );
-		_rightBottom.set( rightBottomSpeed );
+		_left.set( tmpLeft );
+
+		double tmpRight = yVal; // For right motors
+
+		tmpRight += xVal * -1.0;// Makes sure that we reverse one of the wheel sets when turning
+		tmpRight = OI.normalize( tmpRight );
+
+		_right.set( tmpRight );
 	}
+
+	public void driveDistance( double distance )
+	{
+		// Resets the encoder and gyro
+		_encoder.reset();
+		_gyro.reset();
+
+		// While we haven't driven our target distance, keep driving
+		while( _encoder.getDistance() < distance )
+		{
+			drive( _gyro.getAngle() * _kP * -1.0, 1.0 );
+		}
+	}
+	
+	public void stop( )
+	{
+		//	Stops the robot
+		_left.set( 0 );
+		_right.set( 0);
+	}
+
+	public void reset()
+	{
+		// Resets everything in the chassis
+		_encoder.reset();
+		_gyro.reset();
+		stop( );
+	}
+
 }
