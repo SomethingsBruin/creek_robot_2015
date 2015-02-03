@@ -10,11 +10,10 @@ import edu.wpi.first.wpilibj.Gyro;
 public class Chassis
 {
 
-	private CCTalon _left;
-	// private CCTalon _leftBottom;
-	private CCTalon _right;
-	// private CCTalon _rightBottom;
-	private static Chassis _instance;
+	private CCTalon _left;// The left talons on the robot
+	private CCTalon _right;// The right talons on the robot
+
+	private static Chassis _instance;// The instance of the chassis we are using
 
 	private Encoder _encoder;// The encoder for the chassis
 
@@ -28,8 +27,7 @@ public class Chassis
 		_right = new CCTalon( RobotMap.RIGHT_TALON_PORT, RobotMap.RIGHT_TALON_REVERSE );
 
 		_encoder = new Encoder( RobotMap.ENCODER_PORT_A, RobotMap.ENCODER_PORT_B );
-		// The distance per tick of the encoder
-		_encoder.setDistancePerPulse( RobotMap.ENCODER_DISTANCE_PER_PULSE );
+		_encoder.setDistancePerPulse( RobotMap.ENCODER_DISTANCE_PER_PULSE );// The distance per tick of the encoder
 
 		_gyro = new Gyro( RobotMap.GYRO_PORT );
 	}
@@ -52,7 +50,6 @@ public class Chassis
 		tmpLeft = OI.normalize( tmpLeft );
 
 		_left.set( tmpLeft );
-
 		double tmpRight = yVal; // For right motors
 
 		tmpRight += xVal * -1.0;// Makes sure that we reverse one of the wheel sets when turning
@@ -61,6 +58,7 @@ public class Chassis
 		_right.set( tmpRight );
 	}
 
+	
 	public void driveDistance( double distance )
 	{
 		// Resets the encoder and gyro
@@ -72,21 +70,35 @@ public class Chassis
 		{
 			drive( _gyro.getAngle() * _kP * -1.0, 1.0 );
 		}
+
+		stop(); // Stops the robot
 	}
-	
-	public void stop( )
+	 
+
+	public void stop()
 	{
-		//	Stops the robot
+		// Stops the robot
 		_left.set( 0 );
-		_right.set( 0);
+		_right.set( 0 );
 	}
 
 	public void reset()
 	{
 		// Resets everything in the chassis
-		_encoder.reset();
-		_gyro.reset();
-		stop( );
+		// _encoder.reset();
+		// _gyro.reset();
+		stop();
+	}
+	
+	public void turn( double degreesToTurn )
+	{
+		
+	}
+
+	public void drive50()
+	{
+		_left.set( .5 );
+		_right.set( .5 );
 	}
 
 }

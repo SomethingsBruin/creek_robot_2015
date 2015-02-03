@@ -48,5 +48,9 @@ public class RobotMap
 	public static final int ENCODER_DISTANCE_PER_PULSE = 0;
 
 	public static final int GYRO_PORT = -1;
+	
+	public static final int UPPER_LIMIT_SWITCH_PORT = 0;
+	public static final int LOWER_LIMIT_SWITCH_PORT = 1;
+	public static final int TALON_MECHANISM_PORT = 2;
 
 }

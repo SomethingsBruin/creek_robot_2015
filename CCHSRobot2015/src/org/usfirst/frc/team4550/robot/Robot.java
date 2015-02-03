@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 import org.usfirst.frc.team4550.chassis.Chassis;
+import org.usfirst.frc.team4550.mechanism.Mechanism;
 import org.usfirst.frc.team4550.robot.commands.ExampleCommand;
 import org.usfirst.frc.team4550.robot.subsystems.ExampleSubsystem;
 
@@ -21,8 +22,9 @@ public class Robot extends IterativeRobot
 
 	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 
-	public static OI _oi;
-	public Chassis _chassis;
+	public static OI _oi;// The operator interface( driver ) of the robot
+	public Chassis _chassis;// The robot chassis
+	public Mechanism _mechanism;// The robot mechanism
 
 	Command autonomousCommand;
 
@@ -35,6 +37,7 @@ public class Robot extends IterativeRobot
 		// Creates the OI and the Chassis of the robot
 		_oi = new OI();
 		_chassis = Chassis.getInstance();
+		_mechanism = Mechanism.getInstance();
 
 		// instantiate the command used for the autonomous period
 		autonomousCommand = new ExampleCommand();
@@ -47,7 +50,7 @@ public class Robot extends IterativeRobot
 
 	public void autonomousInit()
 	{
-		// schedule the autonomous command (example)
+		// chedule the autonomous command (example)
 		if( autonomousCommand != null )
 		{
 			autonomousCommand.start();
@@ -90,8 +93,21 @@ public class Robot extends IterativeRobot
 	{
 		Scheduler.getInstance().run();
 
+		//Limits the turn speed to .25
+		double turnAxis = _oi.getLJoystickXAxis();
+		if( turnAxis > .25 )
+		{
+			turnAxis = .25;
+		}
+		else if( turnAxis < -.25 )
+		{
+			turnAxis = -.25;
+		}
+		
 		// Drives the chassis by getting the position of the axis of the joystick
 		_chassis.drive( _oi.getLJoystickXAxis(), _oi.getLJoystickYAxis() );
+
+		_mechanism.move( _oi.getL2R2() );//Moves the mechanism up and down based on the L2R2 axis
 	}
 
 	/**
