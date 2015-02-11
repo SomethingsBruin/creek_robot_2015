@@ -1,6 +1,7 @@
 package org.usfirst.frc.team4550.mechanism;
 
 import org.usfirst.frc.team4550.controls.CCTalon;
+import org.usfirst.frc.team4550.robot.OI;
 import org.usfirst.frc.team4550.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -31,15 +32,16 @@ public class Mechanism
 
 	public void move( double controlInput )
 	{
-		if( controlInput > 0 && _upperLimitSwitch.get() )//If we need to move down, then set the talon to move down
+		if( controlInput > 0 && _upperLimitSwitch.get() )// If we need to move down, then set the talon to move down
 		{
-			_mechanismTalon.set( 1 );
+			_mechanismTalon.set( OI.normalizeValue( controlInput ) );
 		}
-		else if( controlInput < 0 && _lowerLimitSwitch.get() )//Otherwise, if we need to move up, then set the talon to move up
+		else if( controlInput < 0 && _lowerLimitSwitch.get() )// Otherwise, if we need to move up, then set the talon to move up
 		{
-			_mechanismTalon.set( -1 );
+			_mechanismTalon.set( OI.normalizeValue( controlInput ) );
 		}
-		else//Otherwise, don't let the robot move
+		else
+		// Otherwise, don't let the robot move
 		{
 			_mechanismTalon.set( 0 );
 		}

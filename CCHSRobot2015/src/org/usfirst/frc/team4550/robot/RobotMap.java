@@ -43,12 +43,15 @@ public class RobotMap
 	public static final int RIGHT_TALON_PORT = 1;
 	public static final boolean RIGHT_TALON_REVERSE = true;
 
-	public static final int ENCODER_PORT_A = -1;
-	public static final int ENCODER_PORT_B = -2;
-	public static final int ENCODER_DISTANCE_PER_PULSE = 0;
+	public static final int LEFT_ENCODER_PORT_A = 4;
+	public static final int LEFT_ENCODER_PORT_B = 5;
+	public static final int RIGHT_ENCODER_PORT_A = 2;
+	public static final int RIGHT_ENCODER_PORT_B = 3;
+	public static final int LEFT_ENCODER_DISTANCE_PER_PULSE = 1;
+	public static final int RIGHT_ENCODER_DISTANCE_PER_PULSE = 1;
 
-	public static final int GYRO_PORT = -1;
-	
+	public static final int GYRO_PORT = 0;
+
 	public static final int UPPER_LIMIT_SWITCH_PORT = 0;
 	public static final int LOWER_LIMIT_SWITCH_PORT = 1;
 	public static final int TALON_MECHANISM_PORT = 2;

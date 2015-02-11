@@ -1,6 +1,7 @@
 package org.usfirst.frc.team4550.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -9,6 +10,8 @@ import org.usfirst.frc.team4550.chassis.Chassis;
 import org.usfirst.frc.team4550.mechanism.Mechanism;
 import org.usfirst.frc.team4550.robot.commands.ExampleCommand;
 import org.usfirst.frc.team4550.robot.subsystems.ExampleSubsystem;
+
+import autonomous.AutoCommand;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -26,6 +29,8 @@ public class Robot extends IterativeRobot
 	public Chassis _chassis;// The robot chassis
 	public Mechanism _mechanism;// The robot mechanism
 
+	AutoCommand _autoCommand;
+	
 	Command autonomousCommand;
 
 	/**
@@ -50,11 +55,12 @@ public class Robot extends IterativeRobot
 
 	public void autonomousInit()
 	{
-		// chedule the autonomous command (example)
+		// Schedule the autonomous command (example)
 		if( autonomousCommand != null )
 		{
 			autonomousCommand.start();
 		}
+		_autoCommand = new AutoCommand( );
 	}
 
 	/**
@@ -63,6 +69,7 @@ public class Robot extends IterativeRobot
 	public void autonomousPeriodic()
 	{
 		Scheduler.getInstance().run();
+		_autoCommand.controlAuto( );
 	}
 
 	public void teleopInit()
@@ -93,7 +100,7 @@ public class Robot extends IterativeRobot
 	{
 		Scheduler.getInstance().run();
 
-		//Limits the turn speed to .25
+		// Limits the turn speed to .25
 		double turnAxis = _oi.getLJoystickXAxis();
 		if( turnAxis > .25 )
 		{
@@ -103,11 +110,11 @@ public class Robot extends IterativeRobot
 		{
 			turnAxis = -.25;
 		}
-		
+
 		// Drives the chassis by getting the position of the axis of the joystick
 		_chassis.drive( _oi.getLJoystickXAxis(), _oi.getLJoystickYAxis() );
 
-		_mechanism.move( _oi.getL2R2() );//Moves the mechanism up and down based on the L2R2 axis
+		_mechanism.move( _oi.getL2R2() );// Moves the mechanism up and down based on the L2R2 axis
 	}
 
 	/**
@@ -115,7 +122,7 @@ public class Robot extends IterativeRobot
 	 */
 	public void testPeriodic()
 	{
-		LiveWindow.run();
+		
 	}
 
 }

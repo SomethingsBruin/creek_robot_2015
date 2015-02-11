@@ -118,4 +118,19 @@ public class OI
 		return value;
 	}
 
+	public static double normalizeValue( double value )
+	{
+		// Normalizes the value.
+		if( value > 1 )
+		{
+			return 1;
+		}
+		else if( value < -1 )
+		{
+			return -1;
+		}
+
+		return value;
+	}
+
 }
