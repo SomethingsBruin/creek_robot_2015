@@ -1,10 +1,13 @@
 package org.usfirst.frc.team4550.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team4550.chassis.Chassis;
 import org.usfirst.frc.team4550.mechanism.Mechanism;
@@ -25,10 +28,19 @@ public class Robot extends IterativeRobot
 
 	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 
-	public static OI _oi;// The operator interface( driver ) of the robot
-	public Chassis _chassis;// The robot chassis
-	public Mechanism _mechanism;// The robot mechanism
-
+	private static OI _oi;// The operator interface( driver ) of the robot
+	private Chassis _chassis;// The robot chassis
+	private Mechanism _mechanism;// The robot mechanism
+	
+	private double _maxUpSpeed = 1;
+	private double _maxDownSpeed = 1;
+	
+	private boolean done = false;
+	
+	private SendableChooser _autoChooser;
+	
+	int autoChoice = 1;
+	
 	AutoCommand _autoCommand;
 	
 	Command autonomousCommand;
@@ -43,7 +55,21 @@ public class Robot extends IterativeRobot
 		_oi = new OI();
 		_chassis = Chassis.getInstance();
 		_mechanism = Mechanism.getInstance();
-
+		
+		SmartDashboard.putNumber( "Max Arm Up Speed: ", _maxUpSpeed );
+		SmartDashboard.putNumber( "Max Arm Down Speed: ", _maxDownSpeed );
+		
+		_autoChooser = new SendableChooser( );
+		_autoChooser.addObject( "Normal Auto", 0 );
+		_autoChooser.addDefault( "Do nothing", 1 );
+		_autoChooser.addObject( "Pick up tote" , 2 );
+		_autoChooser.addObject( "Container Auto", 3 );
+		_autoChooser.addObject(  "Drive Straight" , 4 );
+		_autoChooser.addObject( "Turn", 5 );
+		
+		SmartDashboard.putData( "Auto Chooser", _autoChooser );
+		
+		
 		// instantiate the command used for the autonomous period
 		autonomousCommand = new ExampleCommand();
 	}
@@ -60,7 +86,9 @@ public class Robot extends IterativeRobot
 		{
 			autonomousCommand.start();
 		}
-		_autoCommand = new AutoCommand( );
+		_chassis.reset();
+		autoChoice = (int) _autoChooser.getSelected( );
+		_autoCommand = new AutoCommand( );		
 	}
 
 	/**
@@ -69,7 +97,26 @@ public class Robot extends IterativeRobot
 	public void autonomousPeriodic()
 	{
 		Scheduler.getInstance().run();
-		_autoCommand.controlAuto( );
+		switch( autoChoice )
+		{
+			case 0:
+				_autoCommand.controlAuto( );
+				break;
+			case 2:
+				_autoCommand.liftArm( );
+				break;
+			case 3:
+				_autoCommand.containerAuto();
+				break;
+			case 4:
+				_autoCommand.goStraight();
+				break;
+			case 5:
+				_autoCommand.turn( );
+				break;
+			default :
+				break;
+		}
 	}
 
 	public void teleopInit()
@@ -78,6 +125,9 @@ public class Robot extends IterativeRobot
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
+		
+		_maxUpSpeed = SmartDashboard.getNumber( "Max Arm Up Speed: ", _maxUpSpeed );
+		_maxDownSpeed = SmartDashboard.getNumber( "Max Arm Down Speed: ", _maxDownSpeed );
 		if( autonomousCommand != null )
 		{
 			autonomousCommand.cancel();
@@ -91,6 +141,7 @@ public class Robot extends IterativeRobot
 	public void disabledInit()
 	{
 		_chassis.reset();
+		done = false;
 	}
 
 	/**
@@ -102,19 +153,21 @@ public class Robot extends IterativeRobot
 
 		// Limits the turn speed to .25
 		double turnAxis = _oi.getLJoystickXAxis();
-		if( turnAxis > .25 )
-		{
-			turnAxis = .25;
-		}
-		else if( turnAxis < -.25 )
-		{
-			turnAxis = -.25;
-		}
+		turnAxis /= 4;
 
 		// Drives the chassis by getting the position of the axis of the joystick
 		_chassis.drive( _oi.getLJoystickXAxis(), _oi.getLJoystickYAxis() );
 
-		_mechanism.move( _oi.getL2R2() );// Moves the mechanism up and down based on the L2R2 axis
+		_mechanism.move( OI.normalizeToMaxAndMin( _maxDownSpeed, _maxUpSpeed, _oi.getL2R2() ) );// Moves the mechanism up and down based on the L2R2 axis
+		
+		/*for( int i = 0; i < 15; i++ )
+		{
+			System.out.print( i + ": " + _panel.getCurrent( i ) + " " );
+		}
+		System.out.println( );
+		System.out.println( _panel.getTotalCurrent() );*/
+		System.out.println( _chassis.getAngle() );
+		
 	}
 
 	/**
@@ -122,7 +175,25 @@ public class Robot extends IterativeRobot
 	 */
 	public void testPeriodic()
 	{
+		System.out.println( _chassis.getAngle() );
+		Timer timer = new Timer();
+		timer.start();
+		_chassis.reset();
 		
+		while( timer.get( ) < 2 && !done )
+		{
+			_mechanism.move( -.5 );
+		}
+		
+		_mechanism.move( 0.0 );
+		_chassis.reset();
+		if( !done )
+		{
+			_chassis.turn( -90 );
+			System.out.println( _chassis.getAngle() );
+			done = true;
+		}
+		_chassis.stop( );
 	}
 
 }

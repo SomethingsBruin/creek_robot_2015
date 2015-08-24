@@ -52,6 +52,7 @@ public class Chassis
 		double tmpLeft = yVal; // For left motors
 
 		tmpLeft += xVal;
+		tmpLeft *= 1.03;
 		tmpLeft = OI.normalize( tmpLeft );
 
 		_left.set( tmpLeft );
@@ -100,9 +101,10 @@ public class Chassis
 		double timeOut = 2000;
 		boolean done = false;
 
-		double kP = 0.623;
-		double kI = 0.0347;
-		double kD = 0.35;
+		//Comments should work fine
+		double kP = /*0.345;*/.62;//.62
+		double kI = /*0.059;*/.01863;//.01863
+		double kD = /*0.375;*/.375;//.375
 		double currentTime = System.currentTimeMillis();
 
 		double error = 0.0;
@@ -114,6 +116,7 @@ public class Chassis
 			prevError = error;
 			error = OI.normalizeValue( ( _gyro.getAngle() - degreesToTurn ) / 100.0 );
 			errorSum += error;
+			
 			if( errorSum > 5.0 )
 			{
 				errorSum = 5;
@@ -128,13 +131,13 @@ public class Chassis
 			double d = ( error - prevError ) * kD;
 
 			double speed = p + i + d;
-			if( speed > .35 )
+			if( speed > .4 )
 			{
-				speed = .35;
+				speed = .4;
 			}
-			else if( speed < -.35 )
+			else if( speed < -.4 )
 			{
-				speed = -.35;
+				speed = -.4;
 			}
 
 			this.drive( speed, 0.0 );

@@ -32,6 +32,7 @@ public class Mechanism
 
 	public void move( double controlInput )
 	{
+		System.out.println(_upperLimitSwitch.get() + " " + _lowerLimitSwitch.get());
 		if( controlInput > 0 && _upperLimitSwitch.get() )// If we need to move down, then set the talon to move down
 		{
 			_mechanismTalon.set( OI.normalizeValue( controlInput ) );
@@ -43,7 +44,7 @@ public class Mechanism
 		else
 		// Otherwise, don't let the robot move
 		{
-			_mechanismTalon.set( 0 );
+			_mechanismTalon.set( -.05 );
 		}
 	}
 }

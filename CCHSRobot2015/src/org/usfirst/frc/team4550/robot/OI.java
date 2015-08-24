@@ -49,7 +49,7 @@ public class OI
 	public void printAxis()
 	{
 		// Prints all of the axises on the controller
-		for( int i = 0; i < _joystick.getAxisCount(); i++ )
+		for ( int i = 0; i < _joystick.getAxisCount(); i++ )
 		{
 			System.out.printf( "%10s", i + "   " + _joystick.getRawAxis( i ) + "\t" );
 		}
@@ -104,7 +104,7 @@ public class OI
 
 	public static double normalize( double value )
 	{
-		Math.pow( value, 5 );
+		Math.pow( value, 7 );//7
 		// Normalizes the value.
 		if( value > 1 )
 		{
@@ -130,6 +130,19 @@ public class OI
 			return -1;
 		}
 
+		return value;
+	}
+	
+	public static double normalizeToMaxAndMin( double max, double min, double value )
+	{
+		if( value > max )
+		{
+			return max;
+		}
+		else if( value < -min )
+		{
+			return -min;
+		}
 		return value;
 	}
 
